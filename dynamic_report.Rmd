@@ -1,0 +1,65 @@
+---
+title: "YouTube Ads Analysis"
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+
+# Sample dataset (replace with actual data read from CSV/Google Sheets)
+data <- tibble::tribble(
+  ~Timestamp, ~Context, ~Ad_Name, ~Frequency, ~Ad_Appeal, ~Observations,
+  "31/03/2025 19:47:21", "Before a video (pre-roll ad)", "Wix", 1, "Neutral", "This ad isn’t that long",
+  "31/03/2025 19:48:04", "As a banner/display ad", "Z Rewards for fuel", 1, "Somewhat engaging", NA,
+  "31/03/2025 19:48:21", "During a video (mid-roll ad)", "DoorDash", 2, "Somewhat engaging", NA,
+  "31/03/2025 19:49:21", "Before a video (pre-roll ad)", "Uber Eats", 3, "Neutral", "It comes up quite often",
+  "31/03/2025 19:50:50", "As a banner/display ad", "Z Rewards for fuel", 1, "Neutral", NA
+)
+
+# Summary Statistics
+total_ads <- sum(data$Frequency, na.rm = TRUE)
+most_common_ad_type <- data %>%
+  group_by(Context) %>%
+  summarise(Count = sum(Frequency, na.rm = TRUE)) %>%
+  arrange(desc(Count)) %>%
+  slice(1) %>%
+  pull(Context)
+
+avg_frequency <- mean(data$Frequency, na.rm = TRUE)
+```
+
+## YouTube Ad Insights: Trends and Engagement
+
+This report analyzes **YouTube advertisements** based on their placements (pre-roll, mid-roll, post-roll, and banner ads) and user engagement.
+
+### Key Findings:
+- A total of **`r total_ads`** ads were recorded in this dataset.
+- The most frequently seen ad placement was **`r most_common_ad_type`**.
+- On average, users saw each ad **`r round(avg_frequency, 2)`** times per day.
+
+### Ad Frequency by Placement
+
+```{r echo=FALSE}
+ggplot(data, aes(x = Context, y = Frequency, fill = Context)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Ad Frequency by Placement", x = "Ad Placement", y = "Total Views") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Engagement Levels Across Ads
+
+```{r echo=FALSE}
+ggplot(data, aes(x = Ad_Appeal, fill = Ad_Appeal)) +
+  geom_bar() +
+  labs(title = "Engagement Levels of Ads", x = "Engagement Rating", y = "Count of Ads") +
+  theme_minimal()
+```
+
+### Conclusion
+
+This dynamic report highlights the distribution and engagement of YouTube ads. Future analysis could explore ad effectiveness by **brand** or **content category**.
+
+---
+*End of report.*
